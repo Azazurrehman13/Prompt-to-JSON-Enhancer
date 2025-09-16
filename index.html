@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Prompt Enhancer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f43f5e, #e11d48);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-bottom: 4px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 12px;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-content {
+            padding: 48px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .section:hover {
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .section-title {
+            font-size: 1.6em;
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        select, textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            background: white;
+        }
+
+        .textarea-input {
+            min-height: 160px;
+            resize: vertical;
+        }
+
+        .textarea-output {
+            min-height: 240px;
+            background: #f1f5f9;
+            color: #1f2937;
+        }
+
+        .textarea-json {
+            min-height: 360px;
+            background: #1a1a1a;
+            color: #d1d5db;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            margin: 24px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f9fafb;
+            color: #1f2937;
+            border: 2px solid #e5e7eb;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #e5e7eb;
+            border-color: #4f46e5;
+            color: #4f46e5;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #047857);
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #ffffff;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #dc2626;
+            box-shadow: 0 0 8px rgba(220, 38, 38, 0.5);
+        }
+
+        .status-dot.connected {
+            background: #10b981;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+        }
+
+        .templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .template-card {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover {
+            border-color: #4f46e5;
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .template-card h3 {
+            color: #1f2937;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .template-card p {
+            color: #4b5563;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 10px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            max-width: 320px;
+            font-weight: 500;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #ef4444;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 24px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 6px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .tab.active {
+            background: white;
+            color: #4f46e5;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .main-content {
+                padding: 24px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .section {
+                padding: 16px;
+            }
+            
+            .templates {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Prompt-to-JSON Enhancer</h1>
+            <p>Transform and enhance prompts from any platform into structured JSON with AI-powered optimization</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Backend Status -->
+            <div class="status-indicator" id="backendStatus">
+                <div class="status-dot" id="statusDot"></div>
+                <span id="statusText">Checking backend connection...</span>
+            </div>
+
+            <!-- Capture Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📋</span>
+                    Capture Prompt from Platform
+                </h2>
+                <select id="sourcePlatform" class="textarea-input" style="margin-bottom: 12px;">
+                    <option value="unknown">Select Source Platform</option>
+                    <option value="chatgpt">ChatGPT</option>
+                    <option value="claude">Claude</option>
+                    <option value="gemini">Gemini</option>
+                </select>
+                <textarea 
+                    id="captureInput" 
+                    class="textarea-input" 
+                    placeholder="Paste a prompt from ChatGPT, Claude, or Gemini here..."
+                ></textarea>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="captureAndEnhance()" id="captureBtn">
+                        <span id="captureText">📥 Capture & Enhance</span>
+                        <div class="loading-spinner" id="captureSpinner" style="display: none;"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Manual Input Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">📝</span>
+                    Manual Prompt Input
+                </h2>
+                <textarea 
+                    id="promptInput" 
+                    class="textarea-input" 
+                    placeholder="Enter your prompt here..."
+                ></textarea>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="captureAndEnhance()" id="enhanceBtn">
+                        <span id="enhanceText">🧠 Enhance with AI</span>
+                        <div class="loading-spinner" id="loadingSpinner" style="display: none;"></div>
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearAll()">
+                        🗑️ Clear All
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadExample()">
+                        💡 Load Example
+                    </button>
+                </div>
+            </div>
+
+            <!-- Output Section with Tabs -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="icon">⚡</span>
+                    Enhanced Results
+                </h2>
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('json-structure')">JSON Structure</div>
+                    <div class="tab" onclick="switchTab('enhanced-text')">Enhanced Text</div>
+                </div>
+
+                <!-- JSON Structure Tab -->
+                <div class="tab-content active" id="json-structure">
+                    <textarea 
+                        id="jsonOutput" 
+                        class="textarea-json" 
+                        readonly
+                        placeholder="Structured JSON will appear here..."
+                    ></textarea>
+                    <div class="controls">
+                        <button class="btn btn-success" onclick="copyJSON()">
+                            📋 Copy JSON
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadJSON()">
+                            💾 Download JSON
+                        </button>
+                        <button class="btn btn-secondary" onclick="formatJSON()">
+                            🎨 Pretty Format
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Enhanced Text Tab -->
+                <div class="tab-content" id="enhanced-text">
+                    <textarea 
+                        id="enhancedOutput" 
+                        class="textarea-output" 
+                        readonly
+                        placeholder="AI-enhanced prompt will appear here..."
+                    ></textarea>
+                    <div class="controls">
+                        <button class="btn btn-success" onclick="copyEnhanced()">
+                            📋 Copy Enhanced Text
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadEnhanced()">
+                            💾 Download Text
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Templates -->
+            <div class="templates">
+                <div class="template-card" onclick="loadTemplate('blog')">
+                    <h3>📝 Blog Writing</h3>
+                    <p>Create engaging blog posts with structured content and actionable insights</p>
+                </div>
+                <div class="template-card" onclick="loadTemplate('marketing')">
+                    <h3>📧 Marketing Copy</h3>
+                    <p>Generate persuasive marketing content with strong calls-to-action</p>
+                </div>
+                <div class="template-card" onclick="loadTemplate('technical')">
+                    <h3>💻 Technical Writing</h3>
+                    <p>Produce clear technical documentation with code examples</p>
+                </div>
+                <div class="template-card" onclick="loadTemplate('analysis')">
+                    <h3>📊 Data Analysis</h3>
+                    <p>Generate structured analysis reports with actionable insights</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Configuration - API calls to Flask backend
+        const API_BASE = '/';
+
+        // Global state
+        let backendConnected = false;
+        let lastEnhancedData = null;
+
+        // Template definitions
+        const templates = {
+            blog: "Write a comprehensive blog post about [topic] that includes an engaging introduction, well-structured main points with examples, and a compelling conclusion with actionable takeaways for readers.",
+            marketing: "Create a persuasive marketing email for [product/service] that includes a compelling subject line, personalized greeting, clear value proposition, customer benefits, and a strong call-to-action.",
+            technical: "Write detailed technical documentation for [system/feature] that includes overview, requirements, step-by-step implementation guide, code examples, troubleshooting tips, and best practices.",
+            analysis: "Analyze [data/topic] and provide insights including executive summary, methodology, key findings with supporting evidence, trends analysis, and actionable recommendations."
+        };
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            checkBackendHealth();
+            setupAutoResize();
+            testClaudeConnection();
+        });
+
+        // Backend connection check
+        async function checkBackendHealth() {
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    updateConnectionStatus(data.llm_available.anthropic, `Backend connected • LLM: Claude`);
+                } else {
+                    throw new Error('Backend not responding');
+                }
+            } catch (error) {
+                updateConnectionStatus(false, 'Backend disconnected - using fallback mode');
+            }
+        }
+
+        function updateConnectionStatus(connected, message) {
+            backendConnected = connected;
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            dot.classList.toggle('connected', connected);
+            text.textContent = message;
+        }
+
+        // Capture and enhance prompt
+        async function captureAndEnhance() {
+            const captureInput = document.getElementById('captureInput').value.trim();
+            const promptInput = document.getElementById('promptInput').value.trim();
+            const input = captureInput || promptInput;
+            const sourcePlatform = document.getElementById('sourcePlatform').value;
+            if (!input) {
+                showNotification('Please enter a prompt to enhance!', 'error');
+                return;
+            }
+
+            setLoadingState('capture', true);
+            setLoadingState('enhance', true);
+            try {
+                const response = await fetch(`${API_BASE}/capture`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Source-Platform': sourcePlatform
+                    },
+                    body: JSON.stringify({ prompt: input, source_platform: sourcePlatform })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Backend error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                lastEnhancedData = data;
+                document.getElementById('jsonOutput').value = JSON.stringify(data, null, 2);
+                document.getElementById('enhancedOutput').value = data.task.enhanced_prompt;
+                switchTab('json-structure');
+                showNotification(`Prompt enhanced successfully! 🧠✨`);
+            } catch (error) {
+                console.error('Enhancement failed:', error);
+                showNotification(`Enhancement failed: ${error.message}`, 'error');
+                await enhanceWithFallback(input);
+            } finally {
+                setLoadingState('capture', false);
+                setLoadingState('enhance', false);
+            }
+        }
+
+        async function enhanceWithFallback(prompt) {
+            const enhancedText = `You are an AI assistant tasked with the following:
+
+Task: ${prompt}
+
+Requirements:
+- Provide detailed and accurate information
+- Use clear, professional language
+- Include practical examples where relevant
+- Structure the response logically
+- Ensure the output is actionable and optimized for clarity`;
+
+            const enhancedJSON = {
+                task: {
+                    original_prompt: prompt,
+                    enhanced_prompt: enhancedText
+                }
+            };
+
+            lastEnhancedData = { enhanced_text: enhancedText, enhanced_json: enhancedJSON };
+            document.getElementById('jsonOutput').value = JSON.stringify(enhancedJSON, null, 2);
+            document.getElementById('enhancedOutput').value = enhancedText;
+            showNotification('Prompt enhanced (fallback mode) successfully!');
+        }
+
+        function setLoadingState(type, loading) {
+            const btn = type === 'capture' ? document.getElementById('captureBtn') : document.getElementById('enhanceBtn');
+            const text = type === 'capture' ? document.getElementById('captureText') : document.getElementById('enhanceText');
+            const spinner = type === 'capture' ? document.getElementById('captureSpinner') : document.getElementById('loadingSpinner');
+            btn.disabled = loading;
+            text.style.display = loading ? 'none' : 'flex';
+            spinner.style.display = loading ? 'block' : 'none';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        function copyEnhanced() {
+            const output = document.getElementById('enhancedOutput');
+            if (!output.value) {
+                showNotification('No enhanced text to copy!', 'error');
+                return;
+            }
+            output.select();
+            document.execCommand('copy');
+            showNotification('Enhanced text copied to clipboard!');
+        }
+
+        function copyJSON() {
+            const output = document.getElementById('jsonOutput');
+            if (!output.value) {
+                showNotification('No JSON to copy!', 'error');
+                return;
+            }
+            output.select();
+            document.execCommand('copy');
+            showNotification('JSON copied to clipboard!');
+        }
+
+        function downloadEnhanced() {
+            const content = document.getElementById('enhancedOutput').value;
+            if (!content) {
+                showNotification('No enhanced text to download!', 'error');
+                return;
+            }
+            downloadFile(content, 'enhanced-prompt.txt', 'text/plain');
+            showNotification('Enhanced text downloaded!');
+        }
+
+        function downloadJSON() {
+            const content = document.getElementById('jsonOutput').value;
+            if (!content) {
+                showNotification('No JSON to download!', 'error');
+                return;
+            }
+            downloadFile(content, 'enhanced-prompt.json', 'application/json');
+            showNotification('JSON file downloaded!');
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function formatJSON() {
+            const output = document.getElementById('jsonOutput');
+            if (!output.value) {
+                showNotification('No JSON to format!', 'error');
+                return;
+            }
+            try {
+                const parsed = JSON.parse(output.value);
+                output.value = JSON.stringify(parsed, null, 2);
+                showNotification('JSON formatted successfully!');
+            } catch (e) {
+                showNotification('Invalid JSON format!', 'error');
+            }
+        }
+
+        function clearAll() {
+            document.getElementById('captureInput').value = '';
+            document.getElementById('promptInput').value = '';
+            document.getElementById('enhancedOutput').value = '';
+            document.getElementById('jsonOutput').value = '';
+            lastEnhancedData = null;
+            showNotification('All fields cleared!');
+        }
+
+        function loadExample() {
+            const example = "Write a comprehensive guide about sustainable living practices that includes practical tips for reducing environmental impact, cost-saving benefits, and easy steps beginners can take to start living more sustainably.";
+            document.getElementById('promptInput').value = example;
+            showNotification('Example prompt loaded! Click "Enhance with AI" to see the magic.');
+        }
+
+        function loadTemplate(templateType) {
+            const template = templates[templateType];
+            if (template) {
+                document.getElementById('promptInput').value = template;
+                showNotification(`${templateType.charAt(0).toUpperCase() + templateType.slice(1)} template loaded!`);
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification show ${type === 'error' ? 'error' : ''}`;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        async function testClaudeConnection() {
+            try {
+                showNotification('Testing Claude API connection...', 'info');
+                const response = await fetch(`${API_BASE}/test-claude`);
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showNotification('Claude API is working correctly!');
+                    console.log('Claude test response:', data.response);
+                } else {
+                    showNotification(`Claude API test failed: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showNotification(`Connection test failed: ${error.message}`, 'error');
+                console.error('Test failed:', error);
+            }
+        }
+
+        function setupAutoResize() {
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = this.scrollHeight + 'px';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
